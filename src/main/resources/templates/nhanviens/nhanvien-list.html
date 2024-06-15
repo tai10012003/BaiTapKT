@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security5"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${title} ?: 'Employee Management'">Employee Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<section layout:fragment="content">
+    <h1 style="text-align: center">Danh sách nhân viên</h1>
+    <div sec:authorize="hasAuthority('ADMIN')">
+        <a th:href="@{/nhanviens/add}" class="btn btn-primary mb-3">Thêm mới nhân viên</a>
+    </div>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>Mã nhân viên</th>
+            <th>Tên nhân viên</th>
+            <th>Giới tính</th>
+            <th>Nơi sinh</th>
+            <th>Lương</th>
+            <th>Phòng ban</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="nhanvien : ${nhanViens}">
+            <td th:text="${nhanvien.maNV}"></td>
+            <td th:text="${nhanvien.tenNV}"></td>
+            <td>
+                <img th:src="@{${nhanvien.phai} == 'NU' ? '/images/woman.jpg' : '/images/man.jpg'}" alt="Hình ảnh giới tính" style="max-height: 100px;">
+            </td>
+            <td th:text="${nhanvien.noiSinh}"></td>
+            <td th:text="${nhanvien.luong}"></td>
+            <td th:text="${nhanvien.phongBan.tenPhong}"></td>
+            <td>
+                <div sec:authorize="hasAuthority('ADMIN')">
+                    <a th:href="@{/nhanviens/edit/{id}(id=${nhanvien.maNV})}" class="btn btn-success btn-sm">Sửa</a>
+                    <a th:href="@{/nhanviens/delete/{id}(id=${nhanvien.maNV})}" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc không?')">Xóa</a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${nhanVienPage.number == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/nhanviens(page=${nhanVienPage.number - 1}, size=${nhanVienPage.size})}">&laquo;</a>
+            </li>
+            <li th:each="pageNum : ${#numbers.sequence(0, nhanVienPage.totalPages - 1)}"
+                th:classappend="${nhanVienPage.number == pageNum} ? 'active'">
+                <a class="page-link" th:href="@{/nhanviens(page=${pageNum}, size=${nhanVienPage.size})}" th:text="${pageNum + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${nhanVienPage.number == nhanVienPage.totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/nhanviens(page=${nhanVienPage.number + 1}, size=${nhanVienPage.size})}">&raquo;</a>
+            </li>
+        </ul>
+    </nav>
+
+</section>
+</body>
+</html>
